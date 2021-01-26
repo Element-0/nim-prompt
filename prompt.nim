@@ -78,7 +78,8 @@ type
 
 proc init*(_: type Prompt,
            promptIndicator = defaultpromptIndicator,
-           autoComplete: AutoCompleteProc = nil): Prompt =
+           autoComplete: AutoCompleteProc = nil,
+           ctrlCHandler: CtrlCHandler = nil): Prompt =
   result = Prompt(
     cursorPos: 0,
     line: @[],
@@ -93,7 +94,7 @@ proc init*(_: type Prompt,
     drawnMenuItems: 0,
     statusBar: @[],
     statusDrawn: false,
-    ctrlCHandler: nil
+    ctrlCHandler: ctrlCHandler
   )
 
 proc calcWidth(c: Rune): int =
