@@ -68,10 +68,13 @@ type
     statusBar: seq[StatusBarItem]
     drawnMenuItems: int
     statusDrawn: bool
+    ctrlCHandler: CtrlCHandler
 
   ProgressBar* = ref object of Widget
 
   AutoCompleteProc = proc(line: seq[Rune], cursorpos: int): seq[string] {.gcsafe.}
+
+  CtrlCHandler = proc() {.gcsafe.}
 
 proc init*(_: type Prompt,
            promptIndicator = defaultpromptIndicator,
@@ -89,7 +92,8 @@ proc init*(_: type Prompt,
     activeMenuItem: 0,
     drawnMenuItems: 0,
     statusBar: @[],
-    statusDrawn: false
+    statusDrawn: false,
+    ctrlCHandler: nil
   )
 
 proc calcWidth(c: Rune): int =
@@ -448,6 +452,12 @@ proc saveHistory*(p: Prompt) =
     for i in p.historyFileLines ..< p.history.len:
       outputHistory.writeLine(p.history[i])
   outputHistory.close()
+
+proc handleCtrlC*(p: Prompt) =
+  if p.ctrlCHandler != nil:
+    p.ctrlCHandler()
+  else:
+    quit 1
 
 when defined(windows):
   include prompt/windowsio

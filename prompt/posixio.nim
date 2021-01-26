@@ -131,7 +131,7 @@ template handleKeyPress() =
     of CTRL_B:
       p.cursorLeft()
     of CTRL_C:
-      discard posix.`raise`(SIGINT)
+      p.handleCtrlC()
     of CTRL_D:
       p.deleteKey()
     of CTRL_E:
