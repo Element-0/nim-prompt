@@ -1,4 +1,4 @@
-import posix
+import std/[posix, termios]
 
 const
   BACKSPACE* = 127

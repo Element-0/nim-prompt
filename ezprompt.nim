@@ -1,8 +1,8 @@
-import os, terminal, termios, unicode, lists, unicodedb/widths, system, strutils
+import std/[os, terminal, unicode, lists, strutils, exitprocs], unicodedb/widths
 from strutils import parseInt
 from sequtils import delete
 
-system.addQuitProc(resetAttributes)
+addExitProc(resetAttributes)
 
 const
   ESC* = 27
@@ -110,8 +110,8 @@ proc hidePrompt*(p: Prompt) =
   if drawnLines > 0:
     cursorDown(drawnLines)
     for i in 0 ..< drawnLines:
-     eraseLine()
-     cursorUp()
+      eraseLine()
+      cursorUp()
 
 proc showPrompt*(p: Prompt) =
   hideCursor()
@@ -293,7 +293,6 @@ proc insert(p: Prompt, c: Rune) =
 
 proc deleteAt(p: Prompt, pos: int): bool =
   if pos >= 0 and pos < p.line.len:
-    var c = p.line[pos]
     p.line.delete(pos, pos)
     return true
   return false
@@ -369,7 +368,7 @@ proc skipWordRight*(p: Prompt) =
     else:
       inc p.cursorPos
 
-const wordSeparators = [Rune(' '), Rune(','), Rune(';'), Rune('\t'), Rune('\n')] #array
+const wordSeparators = [Rune(' '), Rune(','), Rune(';'), Rune('\t'), Rune('\n')]             #array
 
 proc rfind(line: seq[Rune], searched: openArray[Rune], startPos: int): int =
   for i in countdown(startPos, 0):
@@ -461,9 +460,9 @@ proc handleCtrlC*(p: Prompt) =
     quit 1
 
 when defined(windows):
-  include prompt/windowsio
+  include ezprompt/windowsio
 else:
-  include prompt/posixio
+  include ezprompt/posixio
 
 proc readLine*(p: Prompt): string =
   p.clear()
@@ -486,7 +485,7 @@ when isMainModule:
 
   test "backspace word":
     template testCase(pos, finalText, finalPos) =
-      var unicodeText = toRunes(text)
+      var unicodeText {.used.} = toRunes(text)
       var p = new Prompt
       p.line = toRunes(text)
       p.cursorPos = pos
@@ -505,7 +504,7 @@ when isMainModule:
 
   test "delete word":
     template testCase(pos, finalText) =
-      var unicodeText = toRunes(text)
+      var unicodeText {.used.} = toRunes(text)
       var p = new Prompt
       p.line = toRunes(text)
       p.cursorPos = pos
@@ -545,10 +544,3 @@ when isMainModule:
     testCase("af", 1, "af", "af", 2)
     testCase("-ab", 3, "abcd", "-abcd", 5)
     testCase("-ab abc", 2, "abcd", "-abcd abc", 5)
-
-  test "insert completion":
-    template testCase(l, pos, completion) =
-      var p = new Prompt
-      p.line = l
-      p.cursorPos = pos
-
