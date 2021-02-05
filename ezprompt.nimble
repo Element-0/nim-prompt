@@ -1,6 +1,6 @@
 mode = ScriptMode.Verbose
 
-packageName   = "prompt"
+packageName   = "ezprompt"
 version       = "0.0.2"
 author        = "Surf1nb1rd"
 description   = "Feature-rich readline replacement"
